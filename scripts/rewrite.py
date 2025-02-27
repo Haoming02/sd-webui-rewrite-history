@@ -10,7 +10,7 @@ from modules.script_callbacks import on_ui_tabs
 from PIL import Image
 
 
-def _process(
+def __process(
     path: str,
     ext_from: str,
     ext_to: str,
@@ -73,8 +73,44 @@ def _process(
     gr.Info("Done!")
 
 
+def __process_single(path_from: str, path_to: str):
+    path_from = path_from.strip('"').strip()
+    path_to = path_to.strip('"').strip()
+
+    if not os.path.isfile(path_from):
+        gr.Warning(f'File "{path_from}" does not exist')
+        return
+
+    if not os.path.isfile(path_to):
+        gr.Warning(f'File "{path_to}" does not exist')
+        return
+
+    try:
+        img_from = Image.open(path_from)
+        img_to = Image.open(path_to)
+    except Image.DecompressionBombError:
+        gr.Warning("Skipping due to DecompressionBombError...")
+        return
+    except Image.UnidentifiedImageError:
+        gr.Warning("Failed to read Image...")
+        return
+
+    info, _ = read_info_from_image(img_from)
+
+    if info is None or not info:
+        gr.Warning("No Infotext Detected...")
+        return
+
+    save_image_with_geninfo(img_to, info, path_to)
+
+    gr.Info("Done!")
+
+
 def RewriteHistory():
     with gr.Blocks() as REEE:
+        group_a = gr.Group(elem_classes="rewrite-group")
+        group_a.__enter__()
+
         with gr.Row():
             path = gr.Textbox(
                 value=None,
@@ -83,7 +119,7 @@ def RewriteHistory():
                 placeholder=os.path.abspath(default_output_dir),
                 max_lines=1,
                 lines=1,
-                scale=5,
+                scale=8,
             )
             btn = gr.Button(
                 value="Process",
@@ -93,17 +129,17 @@ def RewriteHistory():
         with gr.Row():
             ext_from = gr.Dropdown(
                 value="png",
-                label="Target Extension",
+                label="Source Extension",
                 info="from",
                 choices=("png", "jpg", "jpeg", "webp", "avif"),
-                scale=2,
+                scale=3,
             )
             ext_to = gr.Dropdown(
                 value="jpg",
-                label="Result Extension",
+                label="Target Extension",
                 info="to",
                 choices=("png", "jpg", "jpeg", "webp", "avif"),
-                scale=2,
+                scale=3,
             )
             cpu = gr.Number(
                 value=4,
@@ -126,12 +162,48 @@ def RewriteHistory():
                     label="Convert files even if it does not contain infotext",
                 )
 
+        group_a.__exit__()
+        group_b = gr.Group(elem_classes="rewrite-group")
+        group_b.__enter__()
+
+        with gr.Row():
+            path_from = gr.Textbox(
+                value=None,
+                label="Source Image",
+                info="absolute path is recommended",
+                placeholder="C://foo/bar.png",
+                max_lines=1,
+                lines=1,
+                scale=4,
+            )
+            path_to = gr.Textbox(
+                value=None,
+                label="Target Image",
+                info="absolute path is recommended",
+                placeholder="C://bar/foo.jpg",
+                max_lines=1,
+                lines=1,
+                scale=4,
+            )
+            btn_single = gr.Button(
+                value="Transfer",
+                variant="primary",
+                scale=1,
+            )
+
+        group_b.__exit__()
+
         inputs = [path, ext_from, ext_to, cpu, recursive, delete, force]
         for comp in inputs:
             comp.do_not_save_to_config = True
 
         btn.do_not_save_to_config = True
-        btn.click(fn=_process, inputs=inputs)
+        btn.click(fn=__process, inputs=inputs)
+
+        for comp in (group_a, group_b, path_from, path_to, btn_single):
+            comp.do_not_save_to_config = True
+
+        btn_single.click(fn=__process_single, inputs=[path_from, path_to])
 
     return [(REEE, "Rewrite History", "sd-webui-rewrite-history")]
 

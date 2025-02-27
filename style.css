@@ -1,0 +1,19 @@
+#tab_sd-webui-rewrite-history .rewrite-group {
+    background: var(--panel-background-fill);
+    border-radius: 1em;
+    padding: 0em 2em;
+}
+
+#tab_sd-webui-rewrite-history .rewrite-group .gradio-row {
+    margin: 2em 0em;
+    gap: 1em;
+}
+
+#tab_sd-webui-rewrite-history .rewrite-group button {
+    border-radius: 1em;
+    margin: 4px 8px;
+}
+
+#tab_sd-webui-rewrite-history .rewrite-group div {
+    background: unset;
+}

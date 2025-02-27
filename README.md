@@ -1,9 +1,11 @@
 ﻿# SD Webui Rewrite History
-This is an Extension for the [Automatic1111 Webui](https://github.com/AUTOMATIC1111/stable-diffusion-webui), which allows you to mass-convert images to other formats, while keeping their embedded infotext.
+This is an Extension for the [Automatic1111 Webui](https://github.com/AUTOMATIC1111/stable-diffusion-webui), which allows you to mass-convert image(s) to other formats, while keeping their embedded infotext. It also allows you to transfer infotext from 1 image to another.
 
 > Compatible with [Forge](https://github.com/lllyasviel/stable-diffusion-webui-forge)
 
-<p align="center"><img src="./ui.jpg"></p>
+<p align="center">
+<img src="./ui.jpg" width=768>
+</p>
 
 > [!NOTE]
 > The saving parameters *(**eg.** quality)* are still based on the settings under **Saving images/grids**
